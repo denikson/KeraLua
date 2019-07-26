@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Runtime.InteropServices;
 
@@ -28,7 +28,7 @@ namespace KeraLua
         ///  Each new thread has this area initialized with a copy of the area of the main thread. 
         /// </summary>
         /// <returns></returns>
-        public IntPtr ExtraSpace => _luaState - IntPtr.Size;
+        public IntPtr ExtraSpace => new IntPtr(_luaState.ToInt64() - IntPtr.Size);
 
         /// <summary>
         /// Get the main thread object, if the object is the main thread will be equal this
@@ -132,7 +132,7 @@ namespace KeraLua
         private void SetExtraObject<T>(T obj) where T : class
         {
             var handle = GCHandle.Alloc(obj, GCHandleType.Weak);
-            IntPtr extraSpace = _luaState - IntPtr.Size;
+            IntPtr extraSpace = new IntPtr(_luaState.ToInt64() - IntPtr.Size);
             Marshal.WriteIntPtr(extraSpace, GCHandle.ToIntPtr(handle));
         }
 
@@ -141,7 +141,7 @@ namespace KeraLua
             if (luaState == IntPtr.Zero)
                 return null;
 
-            IntPtr extraSpace = luaState - IntPtr.Size;
+            IntPtr extraSpace = new IntPtr(luaState.ToInt64() - IntPtr.Size);
             IntPtr pointer = Marshal.ReadIntPtr(extraSpace);
             var handle = GCHandle.FromIntPtr(pointer);
             if (!handle.IsAllocated)
